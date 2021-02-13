@@ -12,6 +12,65 @@ from django.contrib.postgres.fields.jsonb import JSONField
 
 
 @python_2_unicode_compatible
+class AbstractRegion(models.Model):
+    name = models.CharField(max_length=200, unique=True)
+    forest_region = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['name']
+        abstract = True
+        #app_label = 'disturbance'
+
+    def __str__(self):
+        return self.name
+
+
+@python_2_unicode_compatible
+class AbstractDistrict(models.Model):
+    region = models.ForeignKey(Region, related_name='districts')
+    name = models.CharField(max_length=200, unique=True)
+    code = models.CharField(max_length=3)
+    archive_date = models.DateField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['name']
+        abstract = True
+        #app_label = 'disturbance'
+
+    def __str__(self):
+        return self.name
+
+
+@python_2_unicode_compatible
+class AbstractApplicationType(models.Model):
+
+    APPLICATION_TYPES = ()
+
+    DOMAIN_USED_CHOICES = ()
+
+    # name = models.CharField(max_length=64, unique=True)
+    name = models.CharField(
+        verbose_name='Application Type name',
+        max_length=64,
+        choices=APPLICATION_TYPES,
+    )
+    order = models.PositiveSmallIntegerField(default=0)
+    visible = models.BooleanField(default=True)
+    application_fee = models.DecimalField(max_digits=6, decimal_places=2)
+    oracle_code_application = models.CharField(max_length=50)
+    is_gst_exempt = models.BooleanField(default=True)
+    domain_used = models.CharField(max_length=40, choices=DOMAIN_USED_CHOICES, default=DOMAIN_USED_CHOICES[0][0])
+
+    class Meta:
+        ordering = ['order', 'name']
+        abstract = True
+        #app_label = 'disturbance'
+
+    def __str__(self):
+        return self.name
+
+
+@python_2_unicode_compatible
 class UserAction(models.Model):
     who = models.ForeignKey(EmailUser, null=False, blank=False)
     when = models.DateTimeField(null=False, blank=False, auto_now_add=True)
@@ -205,41 +264,25 @@ class AbstractProposal(RevisionedMixin):
         ('not_reviewed', 'Not Reviewed'), ('awaiting_amendments', 'Awaiting Amendments'), ('amended', 'Amended'),
         ('accepted', 'Accepted'))
 
-#    PROPOSAL_STATE_NEW_LICENCE = 'New Licence'
-#    PROPOSAL_STATE_AMENDMENT = 'Amendment'
-#    PROPOSAL_STATE_RENEWAL = 'Renewal'
-#    PROPOSAL_STATE_CHOICES = (
-#        (1, PROPOSAL_STATE_NEW_LICENCE),
-#        (2, PROPOSAL_STATE_AMENDMENT),
-#        (3, PROPOSAL_STATE_RENEWAL),
-#    )
-
     APPLICATION_TYPE_CHOICES = (
         ('new_proposal', 'New Proposal'),
         ('amendment', 'Amendment'),
         ('renewal', 'Renewal'),
     )
 
-    proposal_type = models.CharField('Proposal Type', max_length=40, choices=APPLICATION_TYPE_CHOICES,
-                                        default=APPLICATION_TYPE_CHOICES[0][0])
-    #proposal_state = models.PositiveSmallIntegerField('Proposal state', choices=PROPOSAL_STATE_CHOICES, default=1)
-
     data = JSONField(blank=True, null=True)
     assessor_data = JSONField(blank=True, null=True)
     comment_data = JSONField(blank=True, null=True)
     schema = JSONField(blank=False, null=False)
     proposed_issuance_approval = JSONField(blank=True, null=True)
-    #hard_copy = models.ForeignKey(Document, blank=True, null=True, related_name='hard_copy')
 
     customer_status = models.CharField('Customer Status', max_length=40, choices=CUSTOMER_STATUS_CHOICES,
                                        default=CUSTOMER_STATUS_CHOICES[1][0])
-    applicant = models.ForeignKey(Organisation, blank=True, null=True, related_name='proposals')
+    #applicant = models.ForeignKey(Organisation, blank=True, null=True, related_name='proposals')
 
     lodgement_number = models.CharField(max_length=9, blank=True, default='')
     lodgement_sequence = models.IntegerField(blank=True, default=0)
-    #lodgement_date = models.DateField(blank=True, null=True)
     lodgement_date = models.DateTimeField(blank=True, null=True)
-    # 20200512 - proxy_applicant also represents an individual making an Apiary application
     proxy_applicant = models.ForeignKey(EmailUser, blank=True, null=True, related_name='disturbance_proxy')
     submitter = models.ForeignKey(EmailUser, blank=True, null=True, related_name='disturbance_proposals')
 
@@ -260,30 +303,25 @@ class AbstractProposal(RevisionedMixin):
     approval = models.ForeignKey('disturbance.Approval',null=True,blank=True)
 
     previous_application = models.ForeignKey('self', on_delete=models.PROTECT, blank=True, null=True)
-    #self_clone = models.ForeignKey('self', on_delete=models.SET_NULL, blank=True, null=True, related_name='proposal_current_state')
     proposed_decline_status = models.BooleanField(default=False)
-    # Special Fields
     title = models.CharField(max_length=255,null=True,blank=True)
-    activity = models.CharField(max_length=255,null=True,blank=True)
-    #region = models.CharField(max_length=255,null=True,blank=True)
-    tenure = models.CharField(max_length=255,null=True,blank=True)
-    #activity = models.ForeignKey(Activity, null=True, blank=True)
-    region = models.ForeignKey(Region, null=True, blank=True)
-    district = models.ForeignKey(District, null=True, blank=True)
-    #tenure = models.ForeignKey(Tenure, null=True, blank=True)
-    application_type = models.ForeignKey(ApplicationType)
-    approval_level = models.CharField('Activity matrix approval level', max_length=255,null=True,blank=True)
-    approval_level_document = models.ForeignKey(ProposalDocument, blank=True, null=True, related_name='approval_level_document')
-    approval_level_comment = models.TextField(blank=True)
-    approval_comment = models.TextField(blank=True)
-    assessment_reminder_sent = models.BooleanField(default=False)
-    weekly_reminder_sent_date = models.DateField(blank=True, null=True)
-    sub_activity_level1 = models.CharField(max_length=255,null=True,blank=True)
-    sub_activity_level2 = models.CharField(max_length=255,null=True,blank=True)
-    management_area = models.CharField(max_length=255,null=True,blank=True)
 
-    # fee_invoice_reference = models.CharField(max_length=50, null=True, blank=True, default='')
-    fee_invoice_references = ArrayField(models.CharField(max_length=50, null=True, blank=True, default=''), null=True, default=fee_invoice_references_default)
+    #activity = models.CharField(max_length=255,null=True,blank=True)
+    #tenure = models.CharField(max_length=255,null=True,blank=True)
+    #region = models.ForeignKey(Region, null=True, blank=True)
+    #district = models.ForeignKey(District, null=True, blank=True)
+    #application_type = models.ForeignKey(ApplicationType)
+    #approval_level = models.CharField('Activity matrix approval level', max_length=255,null=True,blank=True)
+    #approval_level_document = models.ForeignKey(ProposalDocument, blank=True, null=True, related_name='approval_level_document')
+    #approval_level_comment = models.TextField(blank=True)
+    #approval_comment = models.TextField(blank=True)
+    #assessment_reminder_sent = models.BooleanField(default=False)
+    #weekly_reminder_sent_date = models.DateField(blank=True, null=True)
+    #sub_activity_level1 = models.CharField(max_length=255,null=True,blank=True)
+    #sub_activity_level2 = models.CharField(max_length=255,null=True,blank=True)
+    #management_area = models.CharField(max_length=255,null=True,blank=True)
+
+    #fee_invoice_references = ArrayField(models.CharField(max_length=50, null=True, blank=True, default=''), null=True, default=fee_invoice_references_default)
     migrated = models.BooleanField(default=False)
 
     class Meta:
@@ -295,10 +333,58 @@ class AbstractProposal(RevisionedMixin):
         return str(self.id)
 
     #Append 'P' to Proposal id to generate Lodgement number. Lodgement number and lodgement sequence are used to generate Reference.
-    def save(self, *args, **kwargs):
-        super(Proposal, self).save(*args,**kwargs)
-        if self.lodgement_number == '':
-            new_lodgment_id = 'P{0:06d}'.format(self.pk)
-            self.lodgement_number = new_lodgment_id
-            self.save()
+    #def save(self, *args, **kwargs):
+    #    super(Proposal, self).save(*args,**kwargs)
+    #    if self.lodgement_number == '':
+    #        new_lodgment_id = 'P{0:06d}'.format(self.pk)
+    #        self.lodgement_number = new_lodgment_id
+    #        self.save()
+
+
+class AbstractApproval(RevisionedMixin):
+    STATUS_CURRENT = 'current'
+    STATUS_EXPIRED = 'expired'
+    STATUS_CANCELLED = 'cancelled'
+    STATUS_SURRENDERED = 'surrendered'
+    STATUS_SUSPENDED = 'suspended'
+    STATUS_CHOICES = (
+        (STATUS_CURRENT, 'Current'),
+        (STATUS_EXPIRED, 'Expired'),
+        (STATUS_CANCELLED, 'Cancelled'),
+        (STATUS_SURRENDERED, 'Surrendered'),
+        (STATUS_SUSPENDED, 'Suspended')
+    )
+    lodgement_number = models.CharField(max_length=9, blank=True, default='')
+    status = models.CharField(max_length=40, choices=STATUS_CHOICES,
+                                       default=STATUS_CHOICES[0][0])
+    #licence_document = models.ForeignKey(ApprovalDocument, blank=True, null=True, related_name='licence_document')
+    #cover_letter_document = models.ForeignKey(ApprovalDocument, blank=True, null=True, related_name='cover_letter_document')
+    replaced_by = models.ForeignKey('self', blank=True, null=True)
+    #current_proposal = models.ForeignKey(Proposal,related_name='approvals')
+    #renewal_document = models.ForeignKey(ApprovalDocument, blank=True, null=True, related_name='renewal_document')
+    renewal_sent = models.BooleanField(default=False)
+    issue_date = models.DateTimeField()
+    original_issue_date = models.DateField(auto_now_add=True)
+    start_date = models.DateField()
+    expiry_date = models.DateField()
+    surrender_details = JSONField(blank=True,null=True)
+    suspension_details = JSONField(blank=True,null=True)
+    #applicant = models.ForeignKey(Organisation,on_delete=models.PROTECT, blank=True, null=True, related_name='disturbance_approvals')
+    proxy_applicant = models.ForeignKey(EmailUser,on_delete=models.PROTECT, blank=True, null=True, related_name='disturbance_proxy_approvals')
+    extracted_fields = JSONField(blank=True, null=True)
+    cancellation_details = models.TextField(blank=True)
+    cancellation_date = models.DateField(blank=True, null=True)
+    set_to_cancel = models.BooleanField(default=False)
+    set_to_suspend = models.BooleanField(default=False)
+    set_to_surrender = models.BooleanField(default=False)
+    reissued= models.BooleanField(default=False)
+    apiary_approval = models.BooleanField(default=False)
+    no_annual_rental_fee_until = models.DateField(blank=True, null=True)
+    apiary_sites = models.ManyToManyField('ApiarySite', through=ApiarySiteOnApproval, related_name='approval_set')
+    migrated = models.BooleanField(default=False)
+
+    class Meta:
+        #app_label = 'disturbance'
+        abstract = True
+        unique_together = ('lodgement_number', 'issue_date')
 
