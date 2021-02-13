@@ -382,7 +382,7 @@ class AbstractApproval(RevisionedMixin):
     reissued= models.BooleanField(default=False)
     apiary_approval = models.BooleanField(default=False)
     no_annual_rental_fee_until = models.DateField(blank=True, null=True)
-    apiary_sites = models.ManyToManyField('ApiarySite', through=ApiarySiteOnApproval, related_name='approval_set')
+    #apiary_sites = models.ManyToManyField('ApiarySite', through=ApiarySiteOnApproval, related_name='approval_set')
     migrated = models.BooleanField(default=False)
 
     class Meta:
