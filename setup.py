@@ -1,7 +1,7 @@
 from setuptools import setup
 
 kwargs = {
-        'packages': ['common'],
+        'packages': ['ledgercommon'],
         'include_package_data': True,
         'install_requires': [
             'django>=1.8,<=1.11.29',
