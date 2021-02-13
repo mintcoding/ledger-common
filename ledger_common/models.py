@@ -27,7 +27,7 @@ class AbstractRegion(models.Model):
 
 @python_2_unicode_compatible
 class AbstractDistrict(models.Model):
-    region = models.ForeignKey(Region, related_name='districts')
+    region = models.ForeignKey(AbstractRegion, related_name='districts')
     name = models.CharField(max_length=200, unique=True)
     code = models.CharField(max_length=3)
     archive_date = models.DateField(null=True, blank=True)
