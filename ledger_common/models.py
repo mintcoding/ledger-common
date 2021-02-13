@@ -12,84 +12,6 @@ from django.contrib.postgres.fields.jsonb import JSONField
 
 
 @python_2_unicode_compatible
-class ApplicationType(models.Model):
-    DISTURBANCE = 'Disturbance'
-    POWERLINE_MAINTENANCE = 'Powerline Maintenance'
-    APIARY = 'Apiary'
-    TEMPORARY_USE = 'Temporary Use'
-    SITE_TRANSFER = 'Site Transfer'
-
-    APPLICATION_TYPES = (
-        (DISTURBANCE, 'Disturbance'),
-        (POWERLINE_MAINTENANCE, 'Powerline Maintenance'),
-        (APIARY, 'Apiary'),
-        (TEMPORARY_USE, 'Temporary Use'),
-        (SITE_TRANSFER, 'Site Transfer'),
-    )
-
-    APIARY_APPLICATION_TYPES = (APIARY, TEMPORARY_USE, SITE_TRANSFER,)
-
-    DOMAIN_USED_CHOICES = (
-        ('das', 'DAS'),
-        ('apiary', 'Apiary'),
-    )
-
-    # name = models.CharField(max_length=64, unique=True)
-    name = models.CharField(
-        verbose_name='Application Type name',
-        max_length=64,
-        choices=APPLICATION_TYPES,
-    )
-    order = models.PositiveSmallIntegerField(default=0)
-    visible = models.BooleanField(default=True)
-    application_fee = models.DecimalField(max_digits=6, decimal_places=2)
-    oracle_code_application = models.CharField(max_length=50)
-    is_gst_exempt = models.BooleanField(default=True)
-    domain_used = models.CharField(max_length=40, choices=DOMAIN_USED_CHOICES, default=DOMAIN_USED_CHOICES[0][0])
-
-    class Meta:
-        ordering = ['order', 'name']
-        app_label = 'disturbance'
-
-    def __str__(self):
-        return self.name
-
-
-@python_2_unicode_compatible
-class ActivityMatrix(models.Model):
-    # name = models.CharField(verbose_name='Activity matrix name', max_length=24, choices=application_type_choicelist(), default='Disturbance')
-    name = models.CharField(verbose_name='Activity matrix name', max_length=24,
-                            choices=[('Disturbance', u'Disturbance')], default='Disturbance')
-    description = models.CharField(max_length=256, blank=True, null=True)
-    schema = JSONField()
-    replaced_by = models.ForeignKey('self', on_delete=models.PROTECT, blank=True, null=True)
-    version = models.SmallIntegerField(default=1, blank=False, null=False)
-    ordered = models.BooleanField('Activities Ordered Alphabetically', default=False)
-
-    class Meta:
-        app_label = 'disturbance'
-        unique_together = ('name', 'version')
-        verbose_name_plural = "Activity matrix"
-
-    def __str__(self):
-        return '{} - v{}'.format(self.name, self.version)
-
-
-@python_2_unicode_compatible
-class Tenure(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-    order = models.PositiveSmallIntegerField(default=0)
-    application_type = models.ForeignKey(ApplicationType, related_name='tenure_app_types')
-
-    class Meta:
-        ordering = ['order', 'name']
-        app_label = 'disturbance'
-
-    def __str__(self):
-        return '{}: {}'.format(self.name, self.application_type)
-
-
-@python_2_unicode_compatible
 class UserAction(models.Model):
     who = models.ForeignKey(EmailUser, null=False, blank=False)
     when = models.DateTimeField(null=False, blank=False, auto_now_add=True)
@@ -104,7 +26,7 @@ class UserAction(models.Model):
 
     class Meta:
         abstract = True
-        app_label = 'disturbance'
+        #app_label = 'disturbance'
 
 
 class CommunicationsLogEntry(models.Model):
@@ -134,7 +56,8 @@ class CommunicationsLogEntry(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=False, blank=False)
 
     class Meta:
-        app_label = 'disturbance'
+        abstract = True
+        #app_label = 'disturbance'
 
 
 @python_2_unicode_compatible
@@ -146,7 +69,7 @@ class Document(models.Model):
     uploaded_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        app_label = 'disturbance'
+        #app_label = 'disturbance'
         abstract = True
 
     @property
@@ -177,7 +100,8 @@ class SystemMaintenance(models.Model):
     duration.short_description = 'Duration (mins)'
 
     class Meta:
-        app_label = 'disturbance'
+        abstract = True
+        #app_label = 'disturbance'
         verbose_name_plural = "System maintenance"
 
     def __str__(self):
@@ -189,7 +113,8 @@ class TemporaryDocumentCollection(models.Model):
     # input_name = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
-        app_label = 'disturbance'
+        abstract = True
+        #app_label = 'disturbance'
 
 
 # temp document obj for generic file upload component
@@ -202,7 +127,8 @@ class TemporaryDocument(Document):
     # input_name = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
-        app_label = 'disturbance'
+        abstract = True
+        #app_label = 'disturbance'
 
 
 class AbstractProposal(RevisionedMixin):
