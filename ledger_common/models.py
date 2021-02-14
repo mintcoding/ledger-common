@@ -270,7 +270,7 @@ class AbstractProposal(models.Model):
     review_status = models.CharField('Review Status', max_length=30, choices=REVIEW_STATUS_CHOICES,
                                      default=REVIEW_STATUS_CHOICES[0][0])
 
-    approval = models.ForeignKey('ledger_common.Approval',null=True,blank=True)
+    approval = models.ForeignKey('ledger_common.AbstractApproval',null=True,blank=True)
 
     previous_application = models.ForeignKey('self', on_delete=models.PROTECT, blank=True, null=True)
     proposed_decline_status = models.BooleanField(default=False)
