@@ -28,7 +28,7 @@ from rest_framework_datatables.filters import DatatablesFilterBackend
 from rest_framework_datatables.renderers import DatatablesRenderer
 
 from ledger_common.models import AbstractProposal
-from ledger_common.serializers import AbstractProposalSerializer
+#from ledger_common.serializers import AbstractProposalSerializer
 
 import logging
 logger = logging.getLogger(__name__)
