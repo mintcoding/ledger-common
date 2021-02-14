@@ -21,7 +21,6 @@ class AbstractRegion(models.Model):
 
 
 class AbstractDistrict(models.Model):
-    region = models.ForeignKey('ledger_common.AbstractRegion', related_name='districts')
     name = models.CharField(max_length=200, unique=True)
     code = models.CharField(max_length=3)
     archive_date = models.DateField(null=True, blank=True)
@@ -270,7 +269,6 @@ class AbstractProposal(models.Model):
     review_status = models.CharField('Review Status', max_length=30, choices=REVIEW_STATUS_CHOICES,
                                      default=REVIEW_STATUS_CHOICES[0][0])
 
-    approval = models.ForeignKey('ledger_common.AbstractApproval',null=True,blank=True)
 
     previous_application = models.ForeignKey('self', on_delete=models.PROTECT, blank=True, null=True)
     proposed_decline_status = models.BooleanField(default=False)
