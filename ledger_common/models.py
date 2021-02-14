@@ -34,34 +34,34 @@ class AbstractDistrict(models.Model):
         return self.name
 
 
-class AbstractApplicationType(models.Model):
-
-    APPLICATION_TYPES = ()
-
-    DOMAIN_USED_CHOICES = ()
-
-    # name = models.CharField(max_length=64, unique=True)
-    name = models.CharField(
-        verbose_name='Application Type name',
-        max_length=64,
-        choices=APPLICATION_TYPES,
-    )
-    order = models.PositiveSmallIntegerField(default=0)
-    visible = models.BooleanField(default=True)
-    application_fee = models.DecimalField(max_digits=6, decimal_places=2)
-    oracle_code_application = models.CharField(max_length=50)
-    is_gst_exempt = models.BooleanField(default=True)
-    domain_used = models.CharField(max_length=40, choices=DOMAIN_USED_CHOICES
-            #, default=DOMAIN_USED_CHOICES[0][0]
-            )
-
-    class Meta:
-        ordering = ['order', 'name']
-        abstract = True
-        app_label = 'ledger_common'
-
-    def __str__(self):
-        return self.name
+#class AbstractApplicationType(models.Model):
+#
+#    APPLICATION_TYPES = ()
+#
+#    #DOMAIN_USED_CHOICES = ()
+#
+#    # name = models.CharField(max_length=64, unique=True)
+#    name = models.CharField(
+#        verbose_name='Application Type name',
+#        max_length=64,
+#        choices=APPLICATION_TYPES,
+#    )
+#    order = models.PositiveSmallIntegerField(default=0)
+#    visible = models.BooleanField(default=True)
+#    application_fee = models.DecimalField(max_digits=6, decimal_places=2)
+#    oracle_code_application = models.CharField(max_length=50)
+#    is_gst_exempt = models.BooleanField(default=True)
+#    #domain_used = models.CharField(max_length=40, choices=DOMAIN_USED_CHOICES
+#            #, default=DOMAIN_USED_CHOICES[0][0]
+#     #       )
+#
+#    class Meta:
+#        ordering = ['order', 'name']
+#        abstract = True
+#        app_label = 'ledger_common'
+#
+#    def __str__(self):
+#        return self.name
 
 
 class UserAction(models.Model):
