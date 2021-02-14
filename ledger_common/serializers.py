@@ -24,7 +24,7 @@ class EmailUserSerializer(serializers.ModelSerializer):
 class AbstractProposalSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Proposal
+        model = AbstractProposal
         fields = (
                 'id',
                 )
