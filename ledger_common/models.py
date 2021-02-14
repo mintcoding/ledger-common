@@ -1,17 +1,12 @@
-from __future__ import unicode_literals
+#from __future__ import unicode_literals
 import os
 
-from django.contrib.gis.db.models import MultiPolygonField
 from django.db import models
-from django.dispatch import receiver
-from django.db.models.signals import pre_delete
-from django.utils.encoding import python_2_unicode_compatible
 from django.core.exceptions import ValidationError
 from ledger.accounts.models import EmailUser, Document, RevisionedMixin
 from django.contrib.postgres.fields.jsonb import JSONField
 
 
-@python_2_unicode_compatible
 class AbstractRegion(models.Model):
     name = models.CharField(max_length=200, unique=True)
     forest_region = models.BooleanField(default=False)
@@ -19,13 +14,12 @@ class AbstractRegion(models.Model):
     class Meta:
         ordering = ['name']
         abstract = True
-        #app_label = 'disturbance'
+        app_label = 'ledger_common'
 
     def __str__(self):
         return self.name
 
 
-@python_2_unicode_compatible
 class AbstractDistrict(models.Model):
     region = models.ForeignKey(AbstractRegion, related_name='districts')
     name = models.CharField(max_length=200, unique=True)
@@ -35,13 +29,12 @@ class AbstractDistrict(models.Model):
     class Meta:
         ordering = ['name']
         abstract = True
-        #app_label = 'disturbance'
+        app_label = 'ledger_common'
 
     def __str__(self):
         return self.name
 
 
-@python_2_unicode_compatible
 class AbstractApplicationType(models.Model):
 
     APPLICATION_TYPES = ()
@@ -66,13 +59,12 @@ class AbstractApplicationType(models.Model):
     class Meta:
         ordering = ['order', 'name']
         abstract = True
-        #app_label = 'disturbance'
+        app_label = 'ledger_common'
 
     def __str__(self):
         return self.name
 
 
-@python_2_unicode_compatible
 class UserAction(models.Model):
     who = models.ForeignKey(EmailUser, null=False, blank=False)
     when = models.DateTimeField(null=False, blank=False, auto_now_add=True)
@@ -87,10 +79,10 @@ class UserAction(models.Model):
 
     class Meta:
         abstract = True
-        #app_label = 'disturbance'
+        app_label = 'ledger_common'
 
 
-class CommunicationsLogEntry(models.Model):
+class AbstractCommunicationsLogEntry(models.Model):
     TYPE_CHOICES = [
         ('email', 'Email'),
         ('phone', 'Phone Call'),
@@ -118,10 +110,9 @@ class CommunicationsLogEntry(models.Model):
 
     class Meta:
         abstract = True
-        #app_label = 'disturbance'
+        app_label = 'ledger_common'
 
 
-@python_2_unicode_compatible
 class Document(models.Model):
     name = models.CharField(max_length=255, blank=True,
                             verbose_name='name', help_text='')
@@ -130,7 +121,7 @@ class Document(models.Model):
     uploaded_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        #app_label = 'disturbance'
+        app_label = 'ledger_common'
         abstract = True
 
     @property
@@ -146,8 +137,7 @@ class Document(models.Model):
         return self.name or self.filename
 
 
-@python_2_unicode_compatible
-class SystemMaintenance(models.Model):
+class AbstractSystemMaintenance(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
     start_date = models.DateTimeField()
@@ -162,7 +152,7 @@ class SystemMaintenance(models.Model):
 
     class Meta:
         abstract = True
-        #app_label = 'disturbance'
+        app_label = 'ledger_common'
         verbose_name_plural = "System maintenance"
 
     def __str__(self):
@@ -170,29 +160,7 @@ class SystemMaintenance(models.Model):
                                                                              self.start_date, self.end_date)
 
 
-class TemporaryDocumentCollection(models.Model):
-    # input_name = models.CharField(max_length=255, null=True, blank=True)
-
-    class Meta:
-        abstract = True
-        #app_label = 'disturbance'
-
-
-# temp document obj for generic file upload component
-class TemporaryDocument(Document):
-    temp_document_collection = models.ForeignKey(
-        TemporaryDocumentCollection,
-        related_name='documents')
-    _file = models.FileField(max_length=255)
-
-    # input_name = models.CharField(max_length=255, null=True, blank=True)
-
-    class Meta:
-        abstract = True
-        #app_label = 'disturbance'
-
-
-class AbstractProposal(RevisionedMixin):
+class AbstractProposal(models.Model):
     CUSTOMER_STATUS_TEMP = 'temp'
     CUSTOMER_STATUS_DRAFT = 'draft'
     CUSTOMER_STATUS_WITH_ASSESSOR = 'with_assessor'
@@ -328,8 +296,8 @@ class AbstractProposal(RevisionedMixin):
 
     class Meta:
         abstract = True
-        #app_label = 'disturbance'
-        #ordering = ['-id']
+        app_label = 'ledger_common'
+        ordering = ['-id']
 
     def __str__(self):
         return str(self.id)
@@ -343,7 +311,7 @@ class AbstractProposal(RevisionedMixin):
     #        self.save()
 
 
-class AbstractApproval(RevisionedMixin):
+class AbstractApproval(models.Model):
     STATUS_CURRENT = 'current'
     STATUS_EXPIRED = 'expired'
     STATUS_CANCELLED = 'cancelled'
@@ -386,7 +354,7 @@ class AbstractApproval(RevisionedMixin):
     migrated = models.BooleanField(default=False)
 
     class Meta:
-        #app_label = 'disturbance'
+        app_label = 'ledger_common'
         abstract = True
         unique_together = ('lodgement_number', 'issue_date')
 
