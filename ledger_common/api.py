@@ -42,7 +42,6 @@ class AbstractProposalViewSet(viewsets.ModelViewSet):
     def assign_request_user(self, request, *args, **kwargs):
         try:
             logger.warn("in ledger-common api")
-            print("in ledger-common api")
             instance = self.get_object()
             instance.assign_officer(request,request.user)
             #serializer = InternalProposalSerializer(instance,context={'request':request})
@@ -63,7 +62,6 @@ class AbstractProposalViewSet(viewsets.ModelViewSet):
     def assign_to(self, request, *args, **kwargs):
         try:
             logger.warn("in ledger-common api")
-            print("in ledger-common api")
             instance = self.get_object()
             user_id = request.data.get('assessor_id',None)
             user = None
@@ -92,7 +90,6 @@ class AbstractProposalViewSet(viewsets.ModelViewSet):
     def unassign(self, request, *args, **kwargs):
         try:
             logger.warn("in ledger-common api")
-            print("in ledger-common api")
             instance = self.get_object()
             instance.unassign(request)
             #serializer = InternalProposalSerializer(instance,context={'request':request})
