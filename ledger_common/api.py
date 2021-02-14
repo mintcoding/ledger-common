@@ -41,6 +41,7 @@ class AbstractProposalViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['GET',])
     def assign_request_user(self, request, *args, **kwargs):
         try:
+            logger.warn("in ledger-common api")
             instance = self.get_object()
             instance.assign_officer(request,request.user)
             #serializer = InternalProposalSerializer(instance,context={'request':request})
@@ -60,6 +61,7 @@ class AbstractProposalViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['POST',])
     def assign_to(self, request, *args, **kwargs):
         try:
+            logger.warn("in ledger-common api")
             instance = self.get_object()
             user_id = request.data.get('assessor_id',None)
             user = None
@@ -87,6 +89,7 @@ class AbstractProposalViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['GET',])
     def unassign(self, request, *args, **kwargs):
         try:
+            logger.warn("in ledger-common api")
             instance = self.get_object()
             instance.unassign(request)
             #serializer = InternalProposalSerializer(instance,context={'request':request})
