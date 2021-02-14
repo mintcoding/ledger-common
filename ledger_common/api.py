@@ -41,7 +41,7 @@ class AbstractProposalViewSet(viewsets.ModelViewSet):
     serializer_class = AbstractProposalSerializer
 
     def internal_serializer_class(self):
-        return InternalProposalSerializer
+            return InternalProposalSerializer
         except serializers.ValidationError:
             print(traceback.print_exc())
             raise
