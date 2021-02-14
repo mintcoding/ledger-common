@@ -35,22 +35,8 @@ logger = logging.getLogger(__name__)
 
 
 class AbstractProposalViewSet(viewsets.ModelViewSet):
-    #import ipdb; ipdb.set_trace()
-    #queryset = Proposal.objects.all()
-    queryset = AbstractProposal.objects.none()
-    serializer_class = AbstractProposalSerializer
-
-    def internal_serializer_class(self):
-        try:
-            return InternalProposalSerializer
-        except serializers.ValidationError:
-            print(traceback.print_exc())
-            raise
-        except ValidationError as e:
-            handle_validation_error(e)
-        except Exception as e:
-            print(traceback.print_exc())
-            raise serializers.ValidationError(str(e))
+    #queryset = AbstractProposal.objects.none()
+    #serializer_class = AbstractProposalSerializer
 
     @detail_route(methods=['GET',])
     def assign_request_user(self, request, *args, **kwargs):
